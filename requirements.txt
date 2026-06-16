@@ -1,0 +1,4 @@
+openai>=1.0          # LLM 客户端（OpenAI 兼容端点：DeepSeek 等）
+neo4j>=5.0           # 图存储
+python-dotenv        # 读取 .env
+jsonschema           # 可选：测试集 JSON Schema 交叉校验（缺失时回退手写校验）

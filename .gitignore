@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# 密钥 / 本地配置（绝不提交）
+.env
+.env.local
+
+# 运行产物（每文档生成，不入库）
+_kg_out/
+_kg_cli/
+*.draft.json
+*.gold.json
+chunks.json
+graph.json
+coverage.json
+diag.json
+schema.json
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

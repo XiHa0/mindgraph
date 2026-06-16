@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mindgraph"
+version = "0.1.0"
+description = "评测驱动的循环：把单作者文档自动构建成结构化知识图谱 + 可问答 agent"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "XiHa0" }]
+license = { text = "MIT" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "openai>=1.0",
+    "neo4j>=5.0",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+jsonschema = ["jsonschema"]
+
+[project.scripts]
+mindgraph = "mindgraph.cli:main"
+
+[tool.setuptools]
+packages = ["mindgraph"]
+
+[tool.setuptools.package-data]
+mindgraph = ["**/*.md", "**/*.json", "**/*.cypher"]

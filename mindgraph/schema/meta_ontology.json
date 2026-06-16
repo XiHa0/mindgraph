@@ -1,0 +1,53 @@
+{
+  "version": "1",
+  "description": "MindGraph meta-layer 本体（冻结）。domain-layer 在归纳步骤实例化这些类型。机器可读，供抽取约束与图校验使用。",
+  "common_node_properties": {
+    "id": "string  // {type}:{slug}，消歧后唯一",
+    "name": "string  // canonical 名",
+    "summary": "string  // 一句话摘要",
+    "aliases": "string[]  // entity resolution 产物",
+    "source_chunk_ids": "string[]",
+    "salience": "float 0-1",
+    "author_confidence": "float 0-1"
+  },
+  "common_edge_properties": {
+    "source_chunk_id": "string",
+    "confidence": "float 0-1"
+  },
+  "node_types": {
+    "Concept":         { "props": { "definition": "string", "abstraction_level": "int" }, "note": "概念/术语，domain 层主体" },
+    "Claim":           { "props": { "polarity": ["assert", "reject"], "certainty": "float 0-1" }, "note": "论断/主张" },
+    "Principle":       { "props": { "imperative": "string" }, "note": "原则/应然/价值主张" },
+    "Method":          { "props": { "steps": "string[]" }, "note": "方法/做法，应用型主力" },
+    "Argument":        { "props": { "form": ["deductive", "analogical", "empirical", "definitional", "other"] }, "note": "论证" },
+    "Evidence":        { "props": { "kind": ["example", "data", "anecdote", "quote"] }, "note": "论据/例子/数据/引用" },
+    "Condition":       { "props": { "scope": "string" }, "note": "适用条件/边界，应用型主力" },
+    "Counterpoint":    { "props": {}, "note": "作者反对的观点/反例" },
+    "Analogy":         { "props": { "source_domain": "string", "target_domain": "string" }, "note": "类比/隐喻" },
+    "MentalModel":     { "props": { "components": "string[]" }, "note": "框架，多概念组合" },
+    "Question":        { "props": {}, "note": "作者在回答的问题" },
+    "ReasoningPattern":{ "props": { "trigger": "string", "template": "string" }, "note": "作者的思考方式，检索时一并取出" },
+    "Chunk":           { "props": { "text": "string", "section": "string", "order": "int", "doc_id": "string" }, "note": "原文溯源切片，非知识层" }
+  },
+  "edge_types": {
+    "SUPPORTS":      { "from": ["Argument"], "to": ["Claim"] },
+    "REFUTES":       { "from": ["Argument"], "to": ["Claim"] },
+    "USES":          { "from": ["Argument"], "to": ["Evidence"] },
+    "EXEMPLIFIES":   { "from": ["Evidence"], "to": ["Concept", "Claim"] },
+    "APPLIES_WHEN":  { "from": ["Claim", "Method"], "to": ["Condition"] },
+    "ANSWERS":       { "from": ["Claim"], "to": ["Question"] },
+    "DEPENDS_ON":    { "from": ["Concept"], "to": ["Concept"] },
+    "PART_OF":       { "from": ["Concept"], "to": ["Concept"] },
+    "REFINES":       { "from": ["Concept"], "to": ["Concept"] },
+    "GENERALIZES":   { "from": ["Concept"], "to": ["Concept"] },
+    "CAUSES":        { "from": ["*"], "to": ["*"] },
+    "ENABLES":       { "from": ["*"], "to": ["*"] },
+    "CONTRASTS_WITH":{ "from": ["*"], "to": ["*"] },
+    "REALIZES":      { "from": ["Method"], "to": ["Principle"] },
+    "COMPOSED_OF":   { "from": ["MentalModel"], "to": ["Concept"] }
+  },
+  "retrieval_skeletons": {
+    "explanatory": "Question <-ANSWERS- Claim <-SUPPORTS- Argument -USES-> Evidence; Claim -APPLIES_WHEN-> Condition; Claim -CONTRASTS_WITH-> Counterpoint",
+    "applied": "Condition <-APPLIES_WHEN- Method -REALIZES-> Principle; Method -USES-> Evidence(example)"
+  }
+}

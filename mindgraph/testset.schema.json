@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MindGraph gold 测试集单条",
+  "description": "≥100 条分层 gold（SPEC §3）。extraction 题以子图为 gold；reasoning 题以要素清单+rubric 为 gold。",
+  "type": "object",
+  "required": ["id", "type", "section", "hops", "question", "provenance", "verified"],
+  "additionalProperties": false,
+  "properties": {
+    "id":       { "type": "string", "pattern": "^t[0-9]{4,}$" },
+    "type":     { "enum": ["extraction", "reasoning"] },
+    "qtype":    { "enum": ["explanatory", "applied"], "description": "reasoning 题必填" },
+    "section":  { "type": "string", "description": "来源章节/主题，分层抽样用" },
+    "hops":     { "type": "integer", "minimum": 1, "maximum": 3, "description": "1=单跳 2=多跳 3=跨章节综合" },
+    "question": { "type": "string", "minLength": 1 },
+
+    "gold_subgraph": {
+      "type": "object",
+      "description": "extraction 题的 gold",
+      "required": ["nodes", "edges"],
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["type", "name"],
+            "additionalProperties": false,
+            "properties": {
+              "type": { "type": "string" },
+              "name": { "type": "string" }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "type", "to"],
+            "additionalProperties": false,
+            "properties": {
+              "from": { "type": "string" },
+              "type": { "type": "string" },
+              "to":   { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "gold_elements": {
+      "type": "array",
+      "description": "reasoning 题：回答必须包含的要素",
+      "items": { "type": "string" }
+    },
+    "must_not": {
+      "type": "array",
+      "description": "反幻觉：回答不得出现的断言",
+      "items": { "type": "string" }
+    },
+    "rubric": {
+      "type": "object",
+      "description": "reasoning 题评分权重，和应为 1.0",
+      "additionalProperties": { "type": "number" }
+    },
+
+    "provenance": {
+      "type": "array",
+      "description": "gold 溯源 chunk id",
+      "items": { "type": "string" }
+    },
+    "verified": {
+      "type": "boolean",
+      "description": "人工校验后置 true 并冻结（SPEC §3.4）"
+    }
+  },
+  "allOf": [
+    {
+      "if":   { "properties": { "type": { "const": "extraction" } } },
+      "then": { "required": ["gold_subgraph"] }
+    },
+    {
+      "if":   { "properties": { "type": { "const": "reasoning" } } },
+      "then": { "required": ["qtype", "gold_elements", "rubric"] }
+    }
+  ]
+}

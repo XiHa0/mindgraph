@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #eef1f5;
+    color: #1f2328;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { width: 960px; margin: 0 auto; padding: 36px 40px 40px; background: #eef1f5; }
+  header { text-align: center; margin-bottom: 26px; }
+  header h1 { font-size: 30px; letter-spacing: .5px; }
+  header h1 .mg { color: #4f46e5; }
+  header p { color: #57606a; font-size: 15px; margin-top: 8px; }
+
+  .io {
+    text-align: center; font-size: 16px; font-weight: 600; color: #fff;
+    padding: 13px 20px; border-radius: 10px; width: 460px; margin: 0 auto;
+  }
+  .io.in  { background: #475569; }
+  .io.out { background: #16a34a; }
+
+  .arrow { text-align: center; color: #9aa4b2; font-size: 20px; line-height: 1; margin: 8px 0; }
+
+  .step {
+    display: flex; align-items: center; gap: 16px;
+    background: #fff; border: 1px solid #d6dbe1; border-radius: 12px;
+    padding: 15px 20px; box-shadow: 0 1px 2px rgba(16,22,26,.05);
+  }
+  .step .num {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    background: #eef0ff; color: #4f46e5; font-weight: 700; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step .body { flex: 1; }
+  .step .body b { font-size: 16px; }
+  .step .body p { color: #57606a; font-size: 13.5px; margin-top: 3px; line-height: 1.5; }
+  .step .tag {
+    flex: none; font-size: 12px; color: #6b7280; background: #f3f4f6;
+    border-radius: 6px; padding: 4px 9px; white-space: nowrap;
+  }
+  .step.det .num { background: #e8f0ea; color: #16a34a; }
+  .step.det .tag { color: #16a34a; background: #eaf5ee; }
+
+  /* loop block */
+  .loop {
+    position: relative; border: 2px dashed #f59e0b; border-radius: 14px;
+    padding: 14px 16px 16px; margin: 8px 0; background: #fffaf0;
+  }
+  .loop-label {
+    position: absolute; top: -13px; left: 18px; background: #f59e0b; color: #fff;
+    font-size: 12.5px; font-weight: 700; padding: 3px 11px; border-radius: 20px;
+  }
+  .loop .step { margin: 10px 0; }
+  .loop .step:first-of-type { margin-top: 4px; }
+  .loop-back {
+    text-align: center; color: #b45309; font-size: 13px; font-weight: 600;
+    margin-top: 6px;
+  }
+  .loop-back .converge { color: #16a34a; }
+
+  .models {
+    margin-top: 24px; display: flex; gap: 14px;
+  }
+  .models .card {
+    flex: 1; background: #fff; border: 1px solid #d6dbe1; border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .models .card h3 { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .models .card .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .models .card p { color: #57606a; font-size: 12.5px; margin-top: 6px; line-height: 1.5; }
+  .models .brain .dot { background: #4f46e5; }
+  .models .worker .dot { background: #0ea5e9; }
+  .models .judge .dot { background: #9ca3af; }
+
+  .footnote { text-align: center; color: #8a94a2; font-size: 12px; margin-top: 18px; }
+  .pill { font-size: 11px; color: #4f46e5; background: #eef0ff; border-radius: 5px; padding: 2px 7px; }
+  .pill.det { color: #16a34a; background: #eaf5ee; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1><span class="mg">MindGraph</span> 构建流程</h1>
+    <p>把单作者文档构建成知识图谱 —— 评测驱动、循环迭代到收敛。<span class="pill">LLM 步骤</span> <span class="pill det">确定性步骤（无需 LLM）</span></p>
+  </header>
+
+  <div class="io in">📄 输入：单作者文档（著作 / 讲稿 / 笔记，约 10 万–50 万字）</div>
+  <div class="arrow">↓</div>
+
+  <div class="step det">
+    <span class="num">1</span>
+    <div class="body"><b>结构化切分</b><p>过滤目录/页码/OCR 噪声 → 按标题分节 → ~900 字一段（不跨标题）→ 标注片段类型</p></div>
+    <span class="tag">确定性</span>
+  </div>
+  <div class="arrow">↓</div>
+
+  <div class="step">
+    <span class="num">2</span>
+    <div class="body"><b>领域 schema 归纳</b><p>分窗扫全文，抽出该作者的核心概念 → 消歧合并 → 按频次排序，得到概念表 + 别名</p></div>
+    <span class="tag">LLM</span>
+  </div>
+  <div class="arrow">↓</div>
+
+  <div class="step">
+    <span class="num">3</span>
+    <div class="body"><b>生成测试集</b><p>产出 ≥100 条分层 gold（抽取题 + 推理题），人工校验后<strong>冻结</strong>，作为后续度量基准</p></div>
+    <span class="tag">LLM + 人工</span>
+  </div>
+  <div class="arrow">↓</div>
+
+  <div class="loop">
+    <span class="loop-label">⟲ 评测驱动的循环</span>
+
+    <div class="step">
+      <span class="num">4</span>
+      <div class="body"><b>两阶段抽取 → 写入 Neo4j</b><p>先逐片段抽节点 → 实体消歧 → 再在已知节点之间抽关系；写入图数据库</p></div>
+      <span class="tag">LLM（worker）</span>
+    </div>
+
+    <div class="step det">
+      <span class="num">5</span>
+      <div class="body"><b>评测覆盖率</b><p>用冻结的测试集精确计算 节点覆盖率 / 关系覆盖率 / 回答得分</p></div>
+      <span class="tag">确定性</span>
+    </div>
+
+    <div class="step det">
+      <span class="num">6</span>
+      <div class="body"><b>诊断缺漏</b><p>把差异归类：漏节点 / 漏关系 / 错连 / 粒度，并按<strong>类型</strong>统计，定位系统性问题</p></div>
+      <span class="tag">确定性</span>
+    </div>
+
+    <div class="step">
+      <span class="num">7</span>
+      <div class="body"><b>修正策略</b><p>据诊断给下一轮抽取注入针对性指令 + 类型级 few-shot（不含具体答案，防"教到测试集"）</p></div>
+      <span class="tag">规则</span>
+    </div>
+
+    <div class="loop-back">↺ 未收敛 → 回到步骤 ④ 再抽一轮　｜
+      <span class="converge">✓ 收敛：节点≥0.85 且 关系≥0.75 且 回答≥0.80，且不再提升</span>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+  <div class="io out">🗂 输出：作者专属知识图谱 + 基于子图的问答 agent</div>
+
+  <div class="models">
+    <div class="card brain">
+      <h3><span class="dot"></span>编排大脑 = coding agent</h3>
+      <p>造测试集、定/改 schema、跑流程、读报告决定是否再抽一轮。<br>无需 API key —— 它本身就是 agent（如 Claude Code / Codex）。</p>
+    </div>
+    <div class="card worker">
+      <h3><span class="dot"></span>worker（推荐 DeepSeek V4 Pro）</h3>
+      <p>实际干活：两阶段抽取 + 运行时回答。<br>唯一必需的 API key。</p>
+    </div>
+    <div class="card judge">
+      <h3><span class="dot"></span>API judge（可选）</h3>
+      <p>仅"自治模式"用于给回答打分。<br>默认 agent 驱动模式不需要。</p>
+    </div>
+  </div>
+
+  <div class="footnote">固定不变：面向"观点/论证"的元本体（论断·论据·方法·条件·因果…）　｜　随文档变化：作者自己的概念与术语</div>
+</div>
+</body>
+</html>

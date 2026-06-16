@@ -66,24 +66,11 @@ methods, conditions…); what varies per document is the author's own concepts a
 
 ## How it works
 
-```
- document
-  │  chunk (structural: filter TOC/page/OCR noise → split by headings → ~900 chars → tag kind)
-  ▼
- chunks ──► domain schema induction (concept table + aliases)
-  │
-  │  generate ≥100 stratified gold test items → human-verify, then freeze
-  ▼
- extract (two-stage: nodes first → entity resolution → relations among known nodes) ──► Neo4j
-  ▼
- evaluate (node/edge coverage, deterministic) + diagnose (missing node/edge / wrong / granularity, by type)
-  ▼
- revise (inject targeted directives + type-level few-shot into the next round) ──┐
-  ▲                                                                              │
-  └────────────────── not converged → extract again ◄────────────────────────────┘
-  ▼ converged (node≥0.85, edge≥0.75, answer≥0.80 and plateaued)
- knowledge graph + QA (retrieve subgraph → answer)
-```
+<p align="center">
+  <img src="docs/process.png" width="760" alt="MindGraph pipeline: chunk → schema induction → test set → two-stage extraction → evaluate/diagnose/revise loop → converge (diagram labels in Chinese)">
+</p>
+
+> The diagram labels are in Chinese; the same flow is described in text throughout this section.
 
 **Two-layer schema**:
 - meta-layer (fixed): the argumentative structure shared by all "ideas / teaching" text;

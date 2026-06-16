@@ -8,8 +8,12 @@
 ![status](https://img.shields.io/badge/status-v0.1%20early-orange.svg)
 
 Build a knowledge graph from a single author's large body of text (essays, lecture
-transcripts, notes; roughly 100k–500k characters), so a QA assistant can answer along the
+transcripts, notes; roughly 100k–500k characters), so a QA assistant can answer along that
 author's own line of reasoning instead of paraphrasing retrieved fragments.
+
+> **Terminology**: throughout this document, "author" (unless noted otherwise) means the
+> **author of the source corpus** — the person you want to build a graph for — **not** the
+> author of this project/code (XiHa0).
 
 ## The problem this solves
 

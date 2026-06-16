@@ -157,16 +157,19 @@ Without Neo4j, use `extract --store memory --graph-out graph.json` to validate t
 locally. Build a test set with `python -m mindgraph.testset.run generate|freeze`; autonomous
 wiring is in [`mindgraph/SPEC.md`](mindgraph/SPEC.md).
 
-## Status and limitations
+## Design notes (why it works this way)
 
-- Early version (v0.1); interfaces and defaults may change.
-- Entry retrieval currently uses Chinese character-bigram overlap; the setup script already
-  creates full-text / vector indexes, which you can switch to.
-- Neo4j nodes are written with dual labels `:Type:KGNode` (typed label for constraints/indexes,
-  `:KGNode` for generic read queries).
-- You must provide the worker model and Neo4j; the judge is optional.
-- The design spec [`mindgraph/SPEC.md`](mindgraph/SPEC.md) and code map [`wiki.md`](wiki.md)
-  are currently in Chinese.
+- **Chunk by argument unit, filter noise first**: an argument often spans several paragraphs,
+  and fixed-length chunking splits a claim from its evidence; TOC rows, page numbers and OCR
+  placeholders are the #1 source of retrieval noise, so drop them first.
+- **Two-stage extraction**: extract nodes first and resolve them, then extract relations
+  *among the known nodes* — better quality and lower cost.
+- **Entity resolution**: an author refers to one concept by many surface forms; a union-find
+  merges them into canonical + aliases, otherwise subgraphs fall apart.
+- **No "teaching to the test"**: the reviser's few-shot uses only **type-level** abstract
+  patterns, never the concrete gold answers.
+- **Separate scoring from extraction**: the worker extracts, the judge scores — never let one
+  model grade what it extracted.
 
 ## Docs
 

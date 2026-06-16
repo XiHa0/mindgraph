@@ -141,13 +141,14 @@ python -m mindgraph.cli diagnose --gold gold.json --store neo4j --doc-id authorX
 造测试集见 `python -m mindgraph.testset.run generate|freeze`；自治模式接线见
 [`mindgraph/SPEC.md`](mindgraph/SPEC.md)。
 
-## 现状与局限
+## 设计要点（为什么这么做）
 
-- 这是早期版本（v0.1），接口与默认参数可能调整。
-- 入口检索目前用中文字符 bigram 重合做召回；建库脚本已建好全文 / 向量索引，可按需替换为索引召回。
-- Neo4j 节点写 `:类型:KGNode` 双标签（类型标签对应约束/索引，`:KGNode` 供通用读查询）。
-- worker 模型和 Neo4j 需自备；judge 为可选。
-- 设计规范 [`mindgraph/SPEC.md`](mindgraph/SPEC.md) 与代码结构 [`wiki.md`](wiki.md) 目前为中文。
+- **切分按论证单元、先过滤噪声**：思想文档一个论证常跨多段，定长切块会把论断和论据切散；
+  TOC/页码/OCR 占位是检索噪声头号来源，必须先滤掉。
+- **抽取分两阶段**：先抽节点、消歧合并，再"在已知节点之间"抽关系——质量和成本都更好。
+- **实体消歧**：作者用不同说法指同一概念，用并查集合并到 canonical+aliases，否则子图断裂。
+- **防"教到测试集"**：修正器的 few-shot 只用**类型层面**抽象模式，不带入具体 gold 答案。
+- **判分与抽取分离**：worker 抽取，judge 判分——避免"同一个模型判自己抽的"。
 
 ## 文档
 
